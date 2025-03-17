@@ -19,7 +19,6 @@ import { useAuth } from "@/lib/auth";
 
 const Register = () => {
   const { register: registerUser, loading } = useAuth();
-  const [activeRole] = useState<"parent">("parent");
   
   // Basic info
   const [firstName, setFirstName] = useState("");
@@ -53,7 +52,7 @@ const Register = () => {
       email,
       phoneNumber,
       password,
-      role: activeRole
+      role: "parent"
     };
     
     await registerUser(registrationData);

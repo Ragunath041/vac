@@ -67,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // Get users from localStorage
       const users = JSON.parse(localStorage.getItem('users') || '[]');
+      console.log("All users:", users);
       
       // Find user with matching email and role
       const user = users.find((u: any) => 
@@ -74,20 +75,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         (role === 'any' || u.role === role)
       );
       
+      console.log("Found user:", user);
+      
       if (!user) {
         throw new Error('User not found');
       }
       
       // In a real app, you would hash and compare passwords
       // For this demo, we're just doing a simple comparison
-      // Some users might not have a password field, so handle that case
-      if (user.password !== undefined && user.password !== password) {
+      console.log("User password:", user.password, "Input password:", password);
+      
+      // Check password
+      if (user.password !== password) {
         throw new Error('Invalid password');
       }
       
       // Store user in localStorage (excluding password)
-      const { password: _, ...userWithoutPassword } = user;
+      const userWithoutPassword = { ...user };
+      if ('password' in userWithoutPassword) {
+        delete userWithoutPassword.password;
+      }
+      
       localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+      localStorage.setItem('token', 'mock-token-' + Date.now());
+      localStorage.setItem('role', user.role);
       
       // Update state
       setUser(userWithoutPassword);
@@ -96,13 +107,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Redirect based on role
       if (user.role === 'parent') {
-        window.location.href = '/parent-dashboard';
+        navigate("/parent-dashboard");
       } else if (user.role === 'doctor') {
-        window.location.href = '/doctor-dashboard';
+        navigate("/doctor-dashboard");
       }
       
       return userWithoutPassword;
     } catch (error) {
+      console.error("Login error:", error);
       setLoading(false);
       throw error;
     }
@@ -116,21 +128,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await auth.register(data);
       const result = response.data;
 
+      // Include the password in userData for localStorage
       const userData = {
         id: result.user.id,
         email: result.user.email,
         firstName: result.user.firstName,
         lastName: result.user.lastName,
-        role: data.role
+        role: data.role,
+        password: data.password // Save the password in localStorage
       };
 
-      setUser(userData);
+      // Create a version without password for state
+      const { password, ...userWithoutPassword } = userData;
+      
+      setUser(userWithoutPassword);
       setRole(data.role);
       
       // Store in localStorage
       localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
       localStorage.setItem("role", data.role);
+      
+      // Also update the users array in localStorage
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      users.push(userData); // Add the new user with password
+      localStorage.setItem('users', JSON.stringify(users));
       
       toast({
         title: "Registration successful",

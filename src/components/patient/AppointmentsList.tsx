@@ -36,6 +36,60 @@ const DOCTORS = [
   { id: '7', firstName: 'Vikram', lastName: 'Malhotra', specialization: 'Child Specialist' }
 ];
 
+// Add vaccines and doses
+const VACCINES = [
+  { 
+    id: '1', 
+    name: 'BCG', 
+    description: 'Bacillus Calmette-Guérin vaccine',
+    doses: [
+      { id: '1', name: 'Single Dose', age: 'At birth' }
+    ]
+  },
+  { 
+    id: '2', 
+    name: 'OPV', 
+    description: 'Oral Polio Vaccine',
+    doses: [
+      { id: '1', name: 'Dose 1', age: '6 weeks' },
+      { id: '2', name: 'Dose 2', age: '10 weeks' },
+      { id: '3', name: 'Dose 3', age: '14 weeks' },
+      { id: '4', name: 'Booster', age: '16-24 months' }
+    ]
+  },
+  { 
+    id: '3', 
+    name: 'DPT', 
+    description: 'Diphtheria, Pertussis, and Tetanus vaccine',
+    doses: [
+      { id: '1', name: 'Dose 1', age: '6 weeks' },
+      { id: '2', name: 'Dose 2', age: '10 weeks' },
+      { id: '3', name: 'Dose 3', age: '14 weeks' },
+      { id: '4', name: 'Booster 1', age: '16-24 months' },
+      { id: '5', name: 'Booster 2', age: '5-6 years' }
+    ]
+  },
+  { 
+    id: '4', 
+    name: 'MMR', 
+    description: 'Measles, Mumps, and Rubella vaccine',
+    doses: [
+      { id: '1', name: 'Dose 1', age: '9 months' },
+      { id: '2', name: 'Dose 2', age: '16-24 months' }
+    ]
+  },
+  { 
+    id: '5', 
+    name: 'Hepatitis B', 
+    description: 'Hepatitis B vaccine',
+    doses: [
+      { id: '1', name: 'Dose 1', age: 'At birth' },
+      { id: '2', name: 'Dose 2', age: '6 weeks' },
+      { id: '3', name: 'Dose 3', age: '6 months' }
+    ]
+  }
+];
+
 export const AppointmentsList = ({ 
   appointments, 
   onAppointmentBooked,
@@ -59,6 +113,9 @@ export const AppointmentsList = ({
   const [doctors, setDoctors] = useState(DOCTORS);
   const [selectedChild, setSelectedChild] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedVaccine, setSelectedVaccine] = useState("");
+  const [selectedDose, setSelectedDose] = useState("");
+  const [availableDoses, setAvailableDoses] = useState<any[]>([]);
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
   const [reason, setReason] = useState("");
@@ -73,6 +130,20 @@ export const AppointmentsList = ({
     // If switching to completed tab, refresh vaccination records
     if (value === "completed" && onViewVaccinationRecords) {
       onViewVaccinationRecords();
+    }
+  };
+  
+  // Handle vaccine selection
+  const handleVaccineChange = (vaccineId: string) => {
+    setSelectedVaccine(vaccineId);
+    setSelectedDose(""); // Reset dose when vaccine changes
+    
+    // Find the selected vaccine and update available doses
+    const vaccine = VACCINES.find(v => v.id === vaccineId);
+    if (vaccine) {
+      setAvailableDoses(vaccine.doses);
+    } else {
+      setAvailableDoses([]);
     }
   };
   
@@ -99,7 +170,7 @@ export const AppointmentsList = ({
   const handleBookAppointment = async () => {
     try {
       // Validate required fields
-      if (!selectedChild || !selectedDoctor || !appointmentDate || !appointmentTime || !reason) {
+      if (!selectedChild || !selectedDoctor || !appointmentDate || !appointmentTime || !selectedVaccine || !selectedDose || !reason) {
         toast({
           variant: "destructive",
           title: "Error",
@@ -108,13 +179,24 @@ export const AppointmentsList = ({
         return;
       }
 
+      // Get vaccine and dose names for display
+      const vaccine = VACCINES.find(v => v.id === selectedVaccine);
+      const dose = availableDoses.find(d => d.id === selectedDose);
+      
+      const vaccineName = vaccine ? vaccine.name : '';
+      const doseName = dose ? dose.name : '';
+      const vaccineDisplay = `${vaccineName} - ${doseName}`;
+
       const appointmentData = {
         child_id: selectedChild,
         doctor_id: selectedDoctor,
         date: appointmentDate,
         time: appointmentTime,
         reason: reason,
-        notes: notes || null
+        notes: notes || null,
+        vaccine_id: selectedVaccine,
+        dose_id: selectedDose,
+        vaccine_name: vaccineDisplay
       };
 
       console.log("Sending appointment data:", appointmentData);
@@ -132,6 +214,9 @@ export const AppointmentsList = ({
       setSelectedDoctor("");
       setAppointmentDate("");
       setAppointmentTime("");
+      setSelectedVaccine("");
+      setSelectedDose("");
+      setAvailableDoses([]);
       setReason("");
       setNotes("");
       setIsDialogOpen(false);
@@ -196,7 +281,8 @@ export const AppointmentsList = ({
       className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg"
     >
       <div className="space-y-1 mb-3 md:mb-0">
-        <h4 className="font-medium">{appointment.childName} - {appointment.vaccineName}</h4>
+        <h4 className="font-medium">{appointment.childName}</h4>
+        <p className="text-sm font-medium text-vaccine-blue">{appointment.vaccineName}</p>
         <div className="flex items-center text-sm text-gray-500">
           <Calendar className="h-4 w-4 mr-1" />
           <span>{new Date(appointment.date).toLocaleDateString()}</span>
@@ -334,6 +420,43 @@ export const AppointmentsList = ({
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="vaccine">Select Vaccine *</Label>
+                <select 
+                  id="vaccine" 
+                  value={selectedVaccine}
+                  onChange={(e) => handleVaccineChange(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                  required
+                >
+                  <option value="">Select a vaccine</option>
+                  {VACCINES.map((vaccine) => (
+                    <option key={vaccine.id} value={vaccine.id}>
+                      {vaccine.name} - {vaccine.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dose">Select Dose *</Label>
+                <select 
+                  id="dose" 
+                  value={selectedDose}
+                  onChange={(e) => setSelectedDose(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                  disabled={!selectedVaccine}
+                  required
+                >
+                  <option value="">Select a dose</option>
+                  {availableDoses.map((dose) => (
+                    <option key={dose.id} value={dose.id}>
+                      {dose.name} (Recommended: {dose.age})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="appointmentDate">Date *</Label>
                 <Input 
                   id="appointmentDate" 
@@ -393,7 +516,7 @@ export const AppointmentsList = ({
               <div className="space-y-4 py-4">
                 <div className="space-y-1">
                   <h3 className="font-medium text-lg">{selectedAppointment.childName}</h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm font-medium text-vaccine-blue">
                     {selectedAppointment.vaccineName}
                   </p>
                 </div>

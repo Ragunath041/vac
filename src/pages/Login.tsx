@@ -180,6 +180,8 @@ const Login = () => {
   
   // Initialize users when component mounts
   useEffect(() => {
+    // Don't clear localStorage on every page load
+    // Only ensure default users exist
     ensureDoctorUsers();
     ensureParentUsers();
     setStorageVersion(getLocalStorageVersion());
@@ -193,13 +195,13 @@ const Login = () => {
       await login(email, password, "any");
     } catch (error) {
       // Login failed, show error
+      console.error("Login error details:", error);
+      
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: "Invalid email or password. Please try again.",
-        
+        description: error instanceof Error ? error.message : "Invalid email or password. Please try again.",
       });
-      console.log(error);
     }
   };
 
@@ -239,6 +241,53 @@ const Login = () => {
         title: "Doctor credentials auto-filled",
         description: "You can now click Sign In to log in as a doctor.",
       });
+    }
+  };
+
+  // Direct login function that bypasses the auth context
+  const directLogin = (userType: 'parent' | 'doctor') => {
+    // Clear any existing user data
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Find the default user based on type
+    let user;
+    if (userType === 'parent') {
+      user = users.find((u: { email: string }) => u.email === 'parent@example.com');
+    } else {
+      user = users.find((u: { email: string }) => u.email === 'arun.patel@example.com');
+    }
+    
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: `Default ${userType} user not found. Try resetting the data.`,
+      });
+      return;
+    }
+    
+    // Create a copy without password
+    const userWithoutPassword = { ...user };
+    if ('password' in userWithoutPassword) {
+      const userWithPassword = userWithoutPassword as { password: string };
+      delete userWithPassword.password;
+    }
+    
+    // Store in localStorage
+    localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+    localStorage.setItem('token', 'mock-token-' + Date.now());
+    localStorage.setItem('role', userType);
+    
+    // Redirect
+    if (userType === 'parent') {
+      window.location.href = '/parent-dashboard';
+    } else {
+      window.location.href = '/doctor-dashboard';
     }
   };
 
@@ -323,6 +372,26 @@ const Login = () => {
                 >
                   Reset All Data
                 </Button>
+                
+                <div className="flex gap-2 mb-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full border-green-200 text-green-600 hover:bg-green-50"
+                    onClick={() => directLogin('parent')}
+                  >
+                    Login as Parent
+                  </Button>
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full border-blue-200 text-blue-600 hover:bg-blue-50"
+                    onClick={() => directLogin('doctor')}
+                  >
+                    Login as Doctor
+                  </Button>
+                </div>
                 
                 <p className="text-sm text-center text-gray-500 mb-2">
                   Don't have an account?{" "}

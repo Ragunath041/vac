@@ -197,19 +197,22 @@ const Login = () => {
         variant: "destructive",
         title: "Login failed",
         description: "Invalid email or password. Please try again.",
+        
       });
+      console.log(error);
     }
   };
 
   const handleClearLocalStorage = () => {
     if (confirm("Are you sure you want to clear localStorage? This will remove all data.")) {
       localStorage.clear();
+      // Reinitialize with correct data
       ensureDoctorUsers();
       ensureParentUsers();
       setStorageVersion(getLocalStorageVersion());
       toast({
         title: "localStorage cleared",
-        description: "Default users have been re-added.",
+        description: "Default users have been re-added with correct passwords.",
       });
     }
   };
@@ -310,6 +313,15 @@ const Login = () => {
                   onClick={handleAutoFill}
                 >
                   Auto-fill Credentials
+                </Button>
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full mb-4 border-red-200 text-red-600 hover:bg-red-50"
+                  onClick={handleClearLocalStorage}
+                >
+                  Reset All Data
                 </Button>
                 
                 <p className="text-sm text-center text-gray-500 mb-2">

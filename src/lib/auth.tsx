@@ -80,7 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // In a real app, you would hash and compare passwords
       // For this demo, we're just doing a simple comparison
-      if (user.password !== password) {
+      // Some users might not have a password field, so handle that case
+      if (user.password !== undefined && user.password !== password) {
         throw new Error('Invalid password');
       }
       

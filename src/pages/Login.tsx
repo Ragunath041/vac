@@ -36,7 +36,8 @@ const ensureDoctorUsers = () => {
         specialization: 'Pediatrician',
         licenseNumber: 'MED12345',
         hospitalName: 'City Hospital',
-        yearsOfExperience: 10
+        yearsOfExperience: 10,
+        password: 'password'
       },
       {
         id: '2',
@@ -48,7 +49,8 @@ const ensureDoctorUsers = () => {
         specialization: 'Vaccination Specialist',
         licenseNumber: 'MED12346',
         hospitalName: 'City Hospital',
-        yearsOfExperience: 8
+        yearsOfExperience: 8,
+        password: 'password'
       },
       {
         id: '3',
@@ -60,7 +62,8 @@ const ensureDoctorUsers = () => {
         specialization: 'Child Specialist',
         licenseNumber: 'MED12347',
         hospitalName: 'City Hospital',
-        yearsOfExperience: 12
+        yearsOfExperience: 12,
+        password: 'password'
       },
       {
         id: '4',
@@ -72,7 +75,8 @@ const ensureDoctorUsers = () => {
         specialization: 'Pediatrician',
         licenseNumber: 'MED12348',
         hospitalName: 'City Hospital',
-        yearsOfExperience: 7
+        yearsOfExperience: 7,
+        password: 'password'
       },
       {
         id: '5',
@@ -84,7 +88,8 @@ const ensureDoctorUsers = () => {
         specialization: 'Immunologist',
         licenseNumber: 'MED12349',
         hospitalName: 'City Hospital',
-        yearsOfExperience: 15
+        yearsOfExperience: 15,
+        password: 'password'
       },
       {
         id: '6',
@@ -96,7 +101,8 @@ const ensureDoctorUsers = () => {
         specialization: 'Pediatrician',
         licenseNumber: 'MED12350',
         hospitalName: 'City Hospital',
-        yearsOfExperience: 9
+        yearsOfExperience: 9,
+        password: 'password'
       },
       {
         id: '7',
@@ -108,7 +114,8 @@ const ensureDoctorUsers = () => {
         specialization: 'Child Specialist',
         licenseNumber: 'MED12351',
         hospitalName: 'City Hospital',
-        yearsOfExperience: 11
+        yearsOfExperience: 11,
+        password: 'password'
       }
     ];
     
@@ -134,7 +141,8 @@ const ensureParentUsers = () => {
         firstName: 'Parent',
         lastName: 'User',
         role: 'parent',
-        phoneNumber: '9876543200'
+        phoneNumber: '9876543200',
+        password: 'password'
       }
     ];
     

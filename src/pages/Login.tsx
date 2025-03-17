@@ -291,13 +291,6 @@ const Login = () => {
                     Auto-fill Credentials
                   </Button>
                   
-                  <p className="text-sm text-center text-gray-500 mb-2">
-                    Don't have an account?{" "}
-                    <Link to="/register" className="text-vaccine-blue hover:underline">
-                      Sign up
-                    </Link>
-                  </p>
-                  
                   <p className="text-xs text-center text-gray-400">
                     For testing: {activeRole === "parent" ? "parent@example.com" : "arun.patel@example.com"} / password
                   </p>

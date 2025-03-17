@@ -83,10 +83,7 @@ export const AppointmentsList = ({
       const childrenResponse = await childrenApi.getAll();
       setChildren(childrenResponse.data);
       
-      // Fetch doctors from localStorage
-      const doctorsFromStorage = JSON.parse(localStorage.getItem('doctors') || '[]');
-      setDoctors(doctorsFromStorage);
-      
+      // No need to fetch doctors, we're using the DOCTORS constant
       setIsDialogOpen(true);
     } catch (error) {
       console.error("Error fetching data:", error);

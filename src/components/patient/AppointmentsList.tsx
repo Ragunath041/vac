@@ -25,6 +25,17 @@ interface AppointmentsListProps {
   onViewVaccinationRecords?: () => void;
 }
 
+// Add the DOCTORS constant
+const DOCTORS = [
+  { id: 1, firstName: 'Arun', lastName: 'Patel', specialization: 'Pediatrician' },
+  { id: 2, firstName: 'Priya', lastName: 'Sharma', specialization: 'Vaccination Specialist' },
+  { id: 3, firstName: 'Rajesh', lastName: 'Kumar', specialization: 'Child Specialist' },
+  { id: 4, firstName: 'Deepa', lastName: 'Gupta', specialization: 'Pediatrician' },
+  { id: 5, firstName: 'Suresh', lastName: 'Verma', specialization: 'Immunologist' },
+  { id: 6, firstName: 'Anita', lastName: 'Singh', specialization: 'Pediatrician' },
+  { id: 7, firstName: 'Vikram', lastName: 'Malhotra', specialization: 'Child Specialist' }
+];
+
 export const AppointmentsList = ({ 
   appointments, 
   onAppointmentBooked,
@@ -45,7 +56,7 @@ export const AppointmentsList = ({
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [children, setChildren] = useState([]);
-  const [doctors, setDoctors] = useState([]);
+  const [doctors, setDoctors] = useState(DOCTORS);
   const [selectedChild, setSelectedChild] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
@@ -72,9 +83,9 @@ export const AppointmentsList = ({
       const childrenResponse = await childrenApi.getAll();
       setChildren(childrenResponse.data);
       
-      // Fetch doctors
-      const doctorsResponse = await doctorsApi.getAll();
-      setDoctors(doctorsResponse.data);
+      // Fetch doctors from localStorage
+      const doctorsFromStorage = JSON.parse(localStorage.getItem('doctors') || '[]');
+      setDoctors(doctorsFromStorage);
       
       setIsDialogOpen(true);
     } catch (error) {

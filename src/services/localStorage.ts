@@ -669,6 +669,78 @@ export const doctorService = {
   }
 };
 
+// Add a function to ensure doctor data exists in localStorage
+
+export const ensureDoctorsExist = () => {
+  const doctors = JSON.parse(localStorage.getItem('doctors') || '[]');
+  
+  if (doctors.length === 0) {
+    const defaultDoctors = [
+      { 
+        id: 1, 
+        firstName: 'Arun', 
+        lastName: 'Patel', 
+        specialization: 'Pediatrician',
+        email: 'arun.patel@example.com',
+        password: 'password'
+      },
+      { 
+        id: 2, 
+        firstName: 'Priya', 
+        lastName: 'Sharma', 
+        specialization: 'Vaccination Specialist',
+        email: 'priya.sharma@example.com',
+        password: 'password'
+      },
+      { 
+        id: 3, 
+        firstName: 'Rajesh', 
+        lastName: 'Kumar', 
+        specialization: 'Child Specialist',
+        email: 'rajesh.kumar@example.com',
+        password: 'password'
+      },
+      { 
+        id: 4, 
+        firstName: 'Deepa', 
+        lastName: 'Gupta', 
+        specialization: 'Pediatrician',
+        email: 'deepa.gupta@example.com',
+        password: 'password'
+      },
+      { 
+        id: 5, 
+        firstName: 'Suresh', 
+        lastName: 'Verma', 
+        specialization: 'Immunologist',
+        email: 'suresh.verma@example.com',
+        password: 'password'
+      },
+      { 
+        id: 6, 
+        firstName: 'Anita', 
+        lastName: 'Singh', 
+        specialization: 'Pediatrician',
+        email: 'anita.singh@example.com',
+        password: 'password'
+      },
+      { 
+        id: 7, 
+        firstName: 'Vikram', 
+        lastName: 'Malhotra', 
+        specialization: 'Child Specialist',
+        email: 'vikram.malhotra@example.com',
+        password: 'password'
+      }
+    ];
+    
+    localStorage.setItem('doctors', JSON.stringify(defaultDoctors));
+    return defaultDoctors;
+  }
+  
+  return doctors;
+};
+
 // Initialize localStorage when this module is imported
 initializeLocalStorage();
 
@@ -679,5 +751,6 @@ export default {
   appointmentService,
   vaccinationRecordService,
   doctorService,
-  initializeLocalStorage
+  initializeLocalStorage,
+  ensureDoctorsExist
 }; 

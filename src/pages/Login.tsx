@@ -17,6 +17,7 @@ import { Footer } from "@/components/Footer";
 import { Loader2, Syringe, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
+import { ensureDoctorsExist } from "@/services/localStorage";
 
 // Function to ensure doctor users exist in localStorage
 const ensureDoctorUsers = () => {
@@ -176,6 +177,7 @@ const Login = () => {
   useEffect(() => {
     ensureDoctorUsers();
     ensureParentUsers();
+    ensureDoctorsExist(); // Initialize doctors data
     setStorageVersion(getLocalStorageVersion());
   }, []);
   
@@ -225,10 +227,10 @@ const Login = () => {
           </div>
           
           <Tabs defaultValue="parent" onValueChange={(value) => setActiveRole(value as "parent" | "doctor")}>
-            <TabsList className="grid grid-cols-2 mb-6">
+            {/* <TabsList className="grid grid-cols-2 mb-6">
               <TabsTrigger value="parent">Parent/Guardian</TabsTrigger>
               <TabsTrigger value="doctor">Doctor/Admin</TabsTrigger>
-            </TabsList>
+            </TabsList> */}
             
             <Card className="border-t-4 border-t-vaccine-blue animate-in fade-in-50 duration-300">
               <CardHeader>
@@ -282,18 +284,25 @@ const Login = () => {
                     )}
                   </Button>
                   
-                  <Button 
+                  {/* <Button 
                     type="button" 
                     variant="outline" 
                     className="w-full mb-4"
                     onClick={handleAutoFill}
                   >
                     Auto-fill Credentials
-                  </Button>
+                  </Button> */}
                   
-                  <p className="text-xs text-center text-gray-400">
-                    For testing: {activeRole === "parent" ? "parent@example.com" : "arun.patel@example.com"} / password
+                  <p className="text-sm text-center text-gray-500 mb-2">
+                    Don't have an account?{" "}
+                    <Link to="/register" className="text-vaccine-blue hover:underline">
+                      Sign up
+                    </Link>
                   </p>
+                  
+                  {/* <p className="text-xs text-center text-gray-400">
+                    For testing: {activeRole === "parent" ? "parent@example.com" : "arun.patel@example.com"} / password
+                  </p> */}
                 </CardFooter>
               </form>
             </Card>

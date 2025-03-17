@@ -38,6 +38,9 @@ export function Navbar() {
               <Link to="/login">
                 <Button variant="outline" size="sm">Login</Button>
               </Link>
+              <Link to="/register">
+                <Button size="sm">Register</Button>
+              </Link>
             </div>
           )}
         </nav>
@@ -81,6 +84,13 @@ export function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <span>Login</span>
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-md transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span>Register</span>
                   </Link>
                 </>
               )}

@@ -17,7 +17,7 @@ type Role = "parent" | "doctor" | null;
 type AuthContextType = {
   user: User | null;
   role: Role;
-  login: (email: string, password: string, role: Role) => Promise<void>;
+  login: (email: string, password: string, role: string) => Promise<void>;
   register: (data: RegistrationData) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -62,66 +62,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
   
   // Login function
-  const login = async (email: string, password: string, loginRole: Role) => {
-    if (!loginRole) return;
-    
+  const login = async (email: string, password: string, role: string) => {
     setLoading(true);
-    console.log(`Attempting login with email: ${email}, role: ${loginRole}`);
-    
     try {
-      // For a real application, this would be an API call to a backend
-      // For this demo, we're checking against localStorage
+      // Get users from localStorage
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      console.log('All users in localStorage:', users);
       
-      const foundUser = users.find((u: any) => u.email === email && u.role === loginRole);
-      console.log('Found user:', foundUser);
+      // Find user with matching email and role
+      const user = users.find((u: any) => 
+        u.email.toLowerCase() === email.toLowerCase() && 
+        (role === 'any' || u.role === role)
+      );
       
-      if (foundUser) {
-        // For testing purposes, we'll skip password validation
-        // In a real app, we would verify the password hash here
-        
-        const userData = {
-          id: foundUser.id,
-          email: foundUser.email,
-          firstName: foundUser.firstName,
-          lastName: foundUser.lastName,
-          role: loginRole
-        };
-        
-        // Generate a token (in a real app, this would come from the backend)
-        const token = `mock-token-${Date.now()}`;
-        
-        setUser(userData);
-        setRole(loginRole);
-        
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("role", loginRole);
-        
-        toast({
-          title: "Login successful",
-          description: `Welcome back, ${foundUser.firstName}!`,
-        });
-        
-        // Redirect based on role
-        if (loginRole === "parent") {
-          navigate("/parent-dashboard");
-        } else if (loginRole === "doctor") {
-          navigate("/doctor-dashboard");
-        }
-      } else {
-        throw new Error('Invalid email or password');
+      if (!user) {
+        throw new Error('User not found');
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-      });
-    } finally {
+      
+      // In a real app, you would hash and compare passwords
+      // For this demo, we're just doing a simple comparison
+      if (user.password !== password) {
+        throw new Error('Invalid password');
+      }
+      
+      // Store user in localStorage (excluding password)
+      const { password: _, ...userWithoutPassword } = user;
+      localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+      
+      // Update state
+      setUser(userWithoutPassword);
+      setRole(user.role);
       setLoading(false);
+      
+      // Redirect based on role
+      if (user.role === 'parent') {
+        window.location.href = '/parent-dashboard';
+      } else if (user.role === 'doctor') {
+        window.location.href = '/doctor-dashboard';
+      }
+      
+      return userWithoutPassword;
+    } catch (error) {
+      setLoading(false);
+      throw error;
     }
   };
   

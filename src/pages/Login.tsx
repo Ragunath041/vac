@@ -180,21 +180,16 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Try to login as parent first
     try {
-      await login(email, password, "parent");
+      // Try to login with 'any' role to match either parent or doctor
+      await login(email, password, "any");
     } catch (error) {
-      // If parent login fails, try doctor login
-      try {
-        await login(email, password, "doctor");
-      } catch (doctorError) {
-        // Both logins failed, show error
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: "Invalid email or password. Please try again.",
-        });
-      }
+      // Login failed, show error
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: "Invalid email or password. Please try again.",
+      });
     }
   };
 
@@ -212,13 +207,28 @@ const Login = () => {
   };
 
   const handleAutoFill = () => {
-    // Default to parent login
-    setEmail("parent@example.com");
-    setPassword("password");
-    toast({
-      title: "Credentials auto-filled",
-      description: "You can now click Sign In to log in.",
-    });
+    // Ask user which credentials to use
+    const userType = window.confirm(
+      "Click OK to use parent credentials, or Cancel to use doctor credentials."
+    );
+    
+    if (userType) {
+      // Parent credentials
+      setEmail("parent@example.com");
+      setPassword("password");
+      toast({
+        title: "Parent credentials auto-filled",
+        description: "You can now click Sign In to log in as a parent.",
+      });
+    } else {
+      // Doctor credentials
+      setEmail("arun.patel@example.com");
+      setPassword("password");
+      toast({
+        title: "Doctor credentials auto-filled",
+        description: "You can now click Sign In to log in as a doctor.",
+      });
+    }
   };
 
   return (

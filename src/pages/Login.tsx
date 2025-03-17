@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Loader2, Syringe, Trash2 } from "lucide-react";
@@ -165,7 +164,6 @@ const getLocalStorageVersion = () => {
 
 const Login = () => {
   const { login, loading } = useAuth();
-  const [activeRole, setActiveRole] = useState<"parent" | "doctor">("parent");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [storageVersion, setStorageVersion] = useState(getLocalStorageVersion());
@@ -181,8 +179,23 @@ const Login = () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(`Submitting login form with email: ${email}, role: ${activeRole}`);
-    await login(email, password, activeRole);
+    
+    // Try to login as parent first
+    try {
+      await login(email, password, "parent");
+    } catch (error) {
+      // If parent login fails, try doctor login
+      try {
+        await login(email, password, "doctor");
+      } catch (doctorError) {
+        // Both logins failed, show error
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: "Invalid email or password. Please try again.",
+        });
+      }
+    }
   };
 
   const handleClearLocalStorage = () => {
@@ -199,13 +212,9 @@ const Login = () => {
   };
 
   const handleAutoFill = () => {
-    if (activeRole === "parent") {
-      setEmail("parent@example.com");
-      setPassword("password");
-    } else {
-      setEmail("arun.patel@example.com");
-      setPassword("password");
-    }
+    // Default to parent login
+    setEmail("parent@example.com");
+    setPassword("password");
     toast({
       title: "Credentials auto-filled",
       description: "You can now click Sign In to log in.",
@@ -224,87 +233,81 @@ const Login = () => {
             </div>
           </div>
           
-          <Tabs defaultValue="parent" onValueChange={(value) => setActiveRole(value as "parent" | "doctor")}>
-            <TabsList className="grid grid-cols-2 mb-6">
-              <TabsTrigger value="parent">Parent/Guardian</TabsTrigger>
-              <TabsTrigger value="doctor">Doctor/Admin</TabsTrigger>
-            </TabsList>
+          <Card className="border-t-4 border-t-vaccine-blue animate-in fade-in-50 duration-300">
+            <CardHeader>
+              <CardTitle className="text-2xl">Welcome back</CardTitle>
+              <CardDescription>
+                Sign in to your account
+              </CardDescription>
+            </CardHeader>
             
-            <Card className="border-t-4 border-t-vaccine-blue animate-in fade-in-50 duration-300">
-              <CardHeader>
-                <CardTitle className="text-2xl">Welcome back</CardTitle>
-                <CardDescription>
-                  Sign in to your {activeRole === "parent" ? "parent" : "doctor"} account
-                </CardDescription>
-              </CardHeader>
-              
-              <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder={activeRole === "parent" ? "parent@example.com" : "doctor@example.com"}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Password</Label>
-                      <Link to="/forgot-password" className="text-xs text-vaccine-blue hover:underline">
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <Input 
-                      id="password" 
-                      type="password" 
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                </CardContent>
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
                 
-                <CardFooter className="flex flex-col">
-                  <Button type="submit" className="w-full mb-4" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Please wait
-                      </>
-                    ) : (
-                      "Sign In"
-                    )}
-                  </Button>
-                  
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full mb-4"
-                    onClick={handleAutoFill}
-                  >
-                    Auto-fill Credentials
-                  </Button>
-                  
-                  <p className="text-sm text-center text-gray-500 mb-2">
-                    Don't have an account?{" "}
-                    <Link to="/register" className="text-vaccine-blue hover:underline">
-                      Sign up
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link to="/forgot-password" className="text-xs text-vaccine-blue hover:underline">
+                      Forgot password?
                     </Link>
-                  </p>
-                  
-                  <p className="text-xs text-center text-gray-400">
-                    For testing: {activeRole === "parent" ? "parent@example.com" : "arun.patel@example.com"} / password
-                  </p>
-                </CardFooter>
-              </form>
-            </Card>
-          </Tabs>
+                  </div>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </CardContent>
+              
+              <CardFooter className="flex flex-col">
+                <Button type="submit" className="w-full mb-4" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Please wait
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
+                
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full mb-4"
+                  onClick={handleAutoFill}
+                >
+                  Auto-fill Credentials
+                </Button>
+                
+                <p className="text-sm text-center text-gray-500 mb-2">
+                  Don't have an account?{" "}
+                  <Link to="/register" className="text-vaccine-blue hover:underline">
+                    Sign up as Parent
+                  </Link>
+                </p>
+                
+                <p className="text-xs text-center text-gray-400">
+                  For testing: parent@example.com / password (Parent)<br />
+                  For doctors: arun.patel@example.com / password (Doctor)
+                </p>
+              </CardFooter>
+            </form>
+          </Card>
           
           <div className="mt-6 p-4 border rounded-md bg-gray-50">
             <div className="flex justify-between items-center mb-2">

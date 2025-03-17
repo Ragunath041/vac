@@ -27,13 +27,13 @@ interface AppointmentsListProps {
 
 // Add the DOCTORS constant
 const DOCTORS = [
-  { id: 1, firstName: 'Arun', lastName: 'Patel', specialization: 'Pediatrician' },
-  { id: 2, firstName: 'Priya', lastName: 'Sharma', specialization: 'Vaccination Specialist' },
-  { id: 3, firstName: 'Rajesh', lastName: 'Kumar', specialization: 'Child Specialist' },
-  { id: 4, firstName: 'Deepa', lastName: 'Gupta', specialization: 'Pediatrician' },
-  { id: 5, firstName: 'Suresh', lastName: 'Verma', specialization: 'Immunologist' },
-  { id: 6, firstName: 'Anita', lastName: 'Singh', specialization: 'Pediatrician' },
-  { id: 7, firstName: 'Vikram', lastName: 'Malhotra', specialization: 'Child Specialist' }
+  { id: '1', firstName: 'Arun', lastName: 'Patel', specialization: 'Pediatrician' },
+  { id: '2', firstName: 'Priya', lastName: 'Sharma', specialization: 'Vaccination Specialist' },
+  { id: '3', firstName: 'Rajesh', lastName: 'Kumar', specialization: 'Child Specialist' },
+  { id: '4', firstName: 'Deepa', lastName: 'Gupta', specialization: 'Pediatrician' },
+  { id: '5', firstName: 'Suresh', lastName: 'Verma', specialization: 'Immunologist' },
+  { id: '6', firstName: 'Anita', lastName: 'Singh', specialization: 'Pediatrician' },
+  { id: '7', firstName: 'Vikram', lastName: 'Malhotra', specialization: 'Child Specialist' }
 ];
 
 export const AppointmentsList = ({ 
